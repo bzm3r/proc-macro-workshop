@@ -1,18 +1,21 @@
-use quote::quote;
+use proc_macro2::TokenStream as TokenStream2;
+use std::fmt::Debug;
 use syn::{
     braced,
     parse::{Parse, ParseStream},
-    parse_macro_input,
-    token::Brace,
-    ExprBlock, Ident, LitInt, Token,
+    parse_macro_input, Ident, LitInt, Token,
 };
+use quote::quote;
+use crate::template::Template;
+
+mod template;
 
 #[derive(Debug)]
 struct Seq {
     loop_var: Ident,
     range_start: LitInt,
     range_end: LitInt,
-    body: proc_macro2::TokenStream,
+    body: TokenStream2,
 }
 
 impl Parse for Seq {
@@ -20,12 +23,12 @@ impl Parse for Seq {
         let loop_var = input.parse()?;
         input.parse::<Token![in]>()?;
         let range_start = input.parse()?;
+        input.parse::<Token![..]>()?;
         let range_end = input.parse()?;
         let body;
         braced!(body in input);
-        let body = proc_macro2::TokenStream::parse(&body)?;
+        let body = TokenStream2::parse(&body)?;
 
-        eprintln!("seq");
         Ok(Seq {
             loop_var,
             range_start,
@@ -37,15 +40,25 @@ impl Parse for Seq {
 
 #[proc_macro]
 pub fn seq(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    let seq = parse_macro_input!(input as Seq);
-    // let Seq {
-    //     loop_var,
-    //     range_start,
-    //     range_end,
-    // }
+    eprintln!("parsing macro input");
+    let Seq {
+        loop_var,
+        range_start,
+        range_end,
+        body,
+    } = parse_macro_input!(input as Seq);
+    eprintln!(
+        "{:?}, {:?}, {:?}, {:?}",
+        loop_var, range_start, range_end, body
+    );
 
-    let tokens = quote! {};
+    eprintln!("doing loop variable replacement");
+    let template = Template::new(body, loop_var);
 
-    eprintln!("{:#?}", seq);
+    let tokens = quote! {
+
+    };
+
+    eprintln!("output tokens:\n{:#?}", tokens.to_string());
     tokens.into()
 }
