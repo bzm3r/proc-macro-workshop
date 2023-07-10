@@ -9,6 +9,7 @@ use quote::quote;
 use crate::template::Template;
 
 mod template;
+mod partial_stream;
 
 #[derive(Debug)]
 struct Seq {
