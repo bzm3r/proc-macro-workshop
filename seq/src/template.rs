@@ -3,6 +3,9 @@ use proc_macro2::TokenTree as TokenTree2;
 use std::ops::Range;
 use syn::Ident;
 
+use crate::partial_stream::PartialStream;
+use crate::partial_stream::PartialStreamIter;
+
 pub struct Template {
     meta_var: Ident,
     meta_stream: TokenStream2,
@@ -15,7 +18,7 @@ impl From<&Template> for TokenStream2 {
             value
                 .partial_stream
                 .iter()
-                .map(|partial| partial.unwrap_or(value.meta_stream.clone())),
+                .map(|partial| partial.clone_or(value.meta_stream.clone())),
         )
     }
 }
@@ -40,19 +43,9 @@ impl Template {
     fn stream(&self) -> TokenStream2 {
         TokenStream2::from_iter(
             self.partial_stream
-                .clone()
-                .into_iter()
-                .map(|maybe_ts| maybe_ts.unwrap_or(self.meta_stream.clone())),
+                .iter()
+                .map(|maybe_ts| maybe_ts.clone_or(self.meta_stream.clone())),
         )
-    }
-
-    fn all_streams(&self) -> Vec<TokenStream2> {
-        self.range
-            .map(|n| {
-                self.set_meta_var(Ident::new(&n.to_string(), self.meta_var.span()));
-                self.stream()
-            })
-            .collect()
     }
 }
 

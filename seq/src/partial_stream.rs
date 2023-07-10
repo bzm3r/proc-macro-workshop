@@ -2,12 +2,9 @@ use proc_macro2::token_stream::IntoIter as TokenTreeIter2;
 use proc_macro2::Ident;
 use proc_macro2::TokenStream as TokenStream2;
 use proc_macro2::TokenTree as TokenTree2;
-use quote::ToTokens;
 use std::iter::once as iter_once;
 use std::iter::Once;
 use std::iter::Peekable;
-use std::ops::Deref;
-use std::ops::DerefMut;
 
 #[derive(Clone)]
 pub struct PartialStream(Option<TokenStream2>);
@@ -20,31 +17,29 @@ impl From<TokenStream2> for PartialStream {
 
 impl From<TokenTree2> for PartialStream {
     fn from(value: TokenTree2) -> Self {
-        value.into_token_stream().into()
-    }
-}
-
-impl Deref for PartialStream {
-    type Target = Option<TokenStream2>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl DerefMut for PartialStream {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
+        Into::<TokenStream2>::into(value).into()
     }
 }
 
 impl PartialStream {
-    fn meta() -> Self {
+    pub fn meta() -> Self {
         PartialStream(None)
     }
 
-    fn is_meta(&self) -> bool {
+    pub fn is_meta(&self) -> bool {
         self.0.is_none()
+    }
+
+    pub fn as_ref(&self) -> Option<&TokenStream2> {
+        self.0.as_ref()
+    }
+
+    pub fn clone_or(&self, default_stream: TokenStream2) -> TokenStream2 {
+        if let Some(inner) = self.as_ref() {
+            inner.clone()
+        } else {
+            default_stream
+        }
     }
 }
 
@@ -135,7 +130,7 @@ impl<'a> From<PartialStream> for PartialStreamIter<'a> {
 // }
 
 impl<'a> PartialStreamIter<'a> {
-    fn from_stream(stream: TokenStream2, meta_var: &Ident) -> PartialStreamIter {
+    pub fn from_stream(stream: TokenStream2, meta_var: &Ident) -> PartialStreamIter {
         //PartialStreamIter::FromStream(MapAdaptor::new(stream.into_iter(), meta_var).flatten())
         PartialStreamIter::FromStream(FlatPartialIter::new(stream.into_iter(), meta_var))
     }

@@ -110,7 +110,12 @@ macro_rules! tree_param_generator {
     (
         $(
             $var_id:ident 
-            $(($dependency:ident))?
+            $(
+                (
+                    $count_dependency:ident 
+                    $(; $new_range_bound:ident)?
+                )
+            )?
         ),*
     ) => {
         paste! {
@@ -136,8 +141,13 @@ macro_rules! tree_param_generator {
                 
                 $(
                     param_gen_methods!(
-                        $var_id
-                        $(, $dependency)?
+                        $var_id:ident 
+                        $(
+                            (
+                                $count_dependency 
+                                $(; $new_range_bound)?
+                            )
+                        )?
                     );
                 )*
             }
@@ -145,36 +155,79 @@ macro_rules! tree_param_generator {
     }
 }
 
-
-macro_rules! param_gen_methods {
-    ($var_id:ident, $dependency:ident) => {
+macro_rules! param_gen_single {
+    ( $var_id:ident, $($new_range_bound:ident)? ) => {
         paste! {
-            fn [< $var_id _single>](&mut self) -> usize {
+            fn [< $var_id _single>](&mut self $(, $new_range_bound: Range<N>)?) -> N {
+                $(
+                    self.[< update_ $var_id _bounds>]($new_range_bound);
+                )?
                 self.[< $var_id _distrib >].sample(&mut self.rng)
             }
-            
+        }
+    }
+}
+
+macro_rules! param_gen_multiple {
+    (
+        $var_id:ident, $count_dep:ident
+    ) => {
+        paste! {
             fn [< $var_id >](&mut self) -> Vec<usize> {
                 self.[< $var_id _distrib >]
                     .sample_iter(&mut self.rng)
-                    .take(self.[< $dependency _single>]())
+                    .take(self.[< $count_dependency _single>]())
                     .collect()
-            }
-        }
-    };
-    ($var_id:ident) => {
-        paste! {
-            fn [< $var_id _single>](&mut self) -> usize {
-                self.[< $var_id _distrib >].sample(&mut self.rng)
-            }
-            
-            fn $var_id(&mut self) -> usize {
-                self.[< $var_id _single>]()
             }
         }
     };
 }
 
-tree_param_generator!(leaf_width, branch_width, child_depth(branch_width), leaf_data(leaf_width));
+macro_rules! param_gen_methods {
+    ( 
+        $var_id:ident
+        $(
+            $(c: $count_dep:ident), u
+        )? 
+    ) => {}
+    (
+        $var_id:ident($count_dependency:ident ; $new_range_bound:ident)
+    ) => {
+        paste! {
+            fn [< $var_id >](&mut self, ) -> Vec<usize> {
+                self.[< $var_id _distrib >]
+                    .sample_iter(&mut self.rng)
+                    .take(self.[< $count_dependency _single>]())
+                    .collect()
+            }
+        }
+    };
+        ( 
+        $var_id:ident
+        $(
+            $(c: $count_dep:ident)
+        )? 
+    ) => {}
+    (
+        $var_id:ident($count_dependency:ident ; $new_range_bound:ident)
+    ) => {
+        paste! {
+            fn [< $var_id >](&mut self, ) -> Vec<usize> {
+                self.[< $var_id _distrib >]
+                    .sample_iter(&mut self.rng)
+                    .take(self.[< $count_dependency _single>]())
+                    .collect()
+            }
+        }
+    };
+}
+
+tree_param_generator!(
+    leaf_width, 
+    branch_width, 
+    min_child_height(c:branch_width, u), 
+    leaf_data(c:leaf_width)
+);
 
 const MAX_LEAF_WIDTH: usize = 5;
 const MAX_BRANCH_WIDTH: usize = 5;
@@ -189,7 +242,7 @@ fn tree_gen_helper(
 ) -> Tree {
     if current_height > min_height {
         let min_child_heights = tree_param_generator
-            .child_depths().into_iter()
+            .min_child_height().into_iter()
             .map(
                 |child_depth| 
                     current_height.checked_sub(child_height).unwrap_or(0)
@@ -202,7 +255,7 @@ fn tree_gen_helper(
 }
 
 fn gen_rand_tree() -> Tree {
-    let param_generator = TreeParamGenerator::new(0..MAX_LEAF_WIDTH, 0..MAX_BRANCH_WIDTH, 0..MAX_CHILD)
+    let param_generator = TreeParamGenerator::new(0..MAX_LEAF_WIDTH, 0..MAX_BRANCH_WIDTH, 0..MAX_HEIGHT);
 
     Tree::from_trees(vec![])
 }
