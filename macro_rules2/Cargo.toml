@@ -27,4 +27,5 @@ proc-macro2 = { version = "1" }
 quote = "1"
 syn = { version = "2", features = ["full", "extra-traits", "visit-mut"] }
 rand = { version = "0.8", optional=true }
+paste = "1"
 
