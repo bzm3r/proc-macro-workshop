@@ -1,17 +1,7 @@
 use paste::paste;
 
-
-
-
-
-
-use std::{fmt::Debug};
-use syn::{
-    parse::{
-        Error as ParseError,
-    },
-    Ident, Token,
-};
+use std::fmt::Debug;
+use syn::{parse::Error as ParseError, Ident, Token};
 
 macro_rules! preferred_stringify {
     ( $preferred:ident $($rest:tt)* ) => {

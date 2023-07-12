@@ -1,19 +1,7 @@
+use proc_macro2::TokenStream as TokenStream2;
 
-use proc_macro2::{
-    TokenStream as TokenStream2,
-};
-
-
-
-
-
-use std::{fmt::Debug};
-use syn::{
-    parse::{
-        Parse, ParseStream,
-        Result as ParseResult,
-    },
-};
+use std::fmt::Debug;
+use syn::parse::{Parse, ParseStream, Result as ParseResult};
 
 #[derive(Debug)]
 pub(crate) struct MacroTranscriber {

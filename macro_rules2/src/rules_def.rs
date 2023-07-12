@@ -1,19 +1,9 @@
+use proc_macro2::TokenStream as TokenStream2;
 
-use proc_macro2::{
-    TokenStream as TokenStream2,
-};
+use quote::ToTokens;
 
-use quote::{ToTokens};
-
-
-
-use std::{fmt::Debug};
-use syn::{
-    parse::{
-        Parse, ParseStream,
-        Result as ParseResult,
-    },
-};
+use std::fmt::Debug;
+use syn::parse::{Parse, ParseStream, Result as ParseResult};
 
 use crate::repetition::OneOrMore;
 use crate::rule::MacroRule;

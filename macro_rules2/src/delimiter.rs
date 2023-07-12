@@ -1,16 +1,11 @@
+use proc_macro2::{Punct, Span, Spacing as Spacing2};
+use syn::parse::Parser;
 
-
-use proc_macro2::{Punct, Span};
-
+use std::fmt::Debug;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
-
-use std::{fmt::Debug};
 use syn::{
-    parse::{
-        Parse, ParseStream,
-        Result as ParseResult,
-    },
+    parse::{Parse, ParseStream, Result as ParseResult},
     token::{Brace as SynBrace, Bracket as SynBracket, Paren as SynParen},
 };
 
@@ -31,8 +26,26 @@ pub(crate) enum LegalDelimPair {
     },
 }
 
+trait LegalPunctForDelimSeal {}
+
 #[derive(Debug, Clone)]
-pub(crate) struct PunctString(Vec<LegalPunct>);
+pub(crate) struct PunctString {
+    span: Span,
+    puncts: Vec<LegalPunct>,
+    spacing: Spacing2,
+}
+
+pub(crate) struct PunctStringParser {
+    puncts: Vec<Punct>,
+    spacing: Spacing2,
+}
+
+impl Parser for PunctStringParser {
+    fn parse2(self, tokens: proc_macro2::TokenStream) -> ParseResult<Self::Output> {
+        let mut legal_puncts = Vec::with_capacity(self.puncts.len());
+        self.puncts[..(self.puncts.len() - 1)].for_each(|punct| )
+    }
+}
 
 impl Parse for PunctString {
     fn parse(_input: ParseStream) -> ParseResult<Self> {
@@ -40,23 +53,24 @@ impl Parse for PunctString {
     }
 }
 
+impl LegalPunctForDelimSeal for PunctString {}
+
 pub(crate) trait LegalDelimiterSeal {}
 
-pub(crate) enum LegalDelimiter {
-    Punct {
-        start: LegalPunct,
-        end: LegalPunct,
-    },
-    PunctString {
-        start: PunctString,
-        end: PunctString,
-    },
-    None,
+pub(crate) struct LegalDelimiter {
+    start: PunctString,
+    end: PunctString,
 }
 
 impl LegalDelimiterSeal for LegalDelimiter {}
 
-// const PUNCT_EQ: Punct = Punct::new("=", Spacing2::Alone);
+impl Parse for LegalDelimiter {
+    fn parse(input: ParseStream) -> ParseResult<Self> {
+        match self {}
+    }
+}
+
+impl LegalPunctForDelimSeal for LegalPunct {}
 
 macro_rules! legal_punct {
     ( $($id:ident : $p:literal),* ) => {
@@ -120,6 +134,14 @@ legal_punct!(
     And: "&", Bar: "|", At: "@", Dot: ".", Comma: ",", SemiColon: ";",
     Colon: ":", Hash: "#", Dollar: "$", Question: "?", Backslash: "\\"
 );
+
+impl Parse for LegalPunct {
+    fn parse(input: ParseStream) -> ParseResult<Self> {
+        let span = input.cursor().span();
+        let punct: Punct = input.parse()?;
+        Ok((punct, span).into())
+    }
+}
 
 pub(crate) trait LegalPunctSeal {}
 

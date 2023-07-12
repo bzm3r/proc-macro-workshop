@@ -1,19 +1,7 @@
+use proc_macro2::{extra::DelimSpan as DelimSpan2, Delimiter as Delimiter2};
 
-use proc_macro2::{
-    extra::DelimSpan as DelimSpan2, Delimiter as Delimiter2,
-};
-
-
-
-
-
-use std::{fmt::Debug};
-use syn::{
-    parse::{
-        discouraged::AnyDelimiter, Parse, ParseStream,
-        Result as ParseResult,
-    },
-};
+use std::fmt::Debug;
+use syn::parse::{discouraged::AnyDelimiter, Parse, ParseStream, Result as ParseResult};
 
 use crate::macro_match::MacroMatch;
 use crate::repetition::ZeroOrMore;

@@ -1,16 +1,9 @@
-
-
-
-
-
 use std::iter::once;
 use std::ops::{Deref, DerefMut};
 use std::{fmt::Debug, ops::Range};
 use syn::{
-    parse::{
-        Error as ParseError, Parse, ParseStream,
-        Result as ParseResult,
-    }, Token,
+    parse::{Error as ParseError, Parse, ParseStream, Result as ParseResult},
+    Token,
 };
 
 #[derive(Debug)]

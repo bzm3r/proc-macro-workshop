@@ -1,14 +1,5 @@
-
-use proc_macro2::{
-    TokenStream as TokenStream2,
-};
-use proc_macro2::{Span};
-
-
-
-
-
-
+use proc_macro2::Span;
+use proc_macro2::TokenStream as TokenStream2;
 
 use crate::delimiter::LegalDelimPair;
 

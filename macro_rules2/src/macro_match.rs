@@ -1,18 +1,10 @@
-use proc_macro2::{
-    TokenStream as TokenStream2,
-};
+use proc_macro2::TokenStream as TokenStream2;
 
-
-
-
-
-use std::{fmt::Debug};
+use std::fmt::Debug;
 use syn::{
-    parse::{
-        Parse, ParseStream,
-        Result as ParseResult,
-    },
-    token::{Token}, Token,
+    parse::{Parse, ParseStream, Result as ParseResult},
+    token::Token,
+    Token,
 };
 
 use crate::match_rep::MacroMatchRep;
@@ -50,7 +42,7 @@ impl Parse for MacroMatch {
             if let Ok(macro_matcher) = fork.parse::<MacroMatcher>() {
                 Ok(MacroMatch::Matcher(Box::new(macro_matcher)))
             } else {
-                Ok(MacroMatch::Tokens(TokenStream2::parse(&input)?))
+                Ok(MacroMatch::Tokens(TokenStream2::parse(input)?))
             }
         }
     }

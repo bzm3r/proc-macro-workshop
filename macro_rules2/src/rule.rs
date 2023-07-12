@@ -1,16 +1,7 @@
-
-
-
-
-
-
-
-use std::{fmt::Debug};
+use std::fmt::Debug;
 use syn::{
-    parse::{
-        discouraged::AnyDelimiter, Parse, ParseStream,
-        Result as ParseResult,
-    }, Token,
+    parse::{discouraged::AnyDelimiter, Parse, ParseStream, Result as ParseResult},
+    Token,
 };
 
 use crate::matcher::MacroMatcher;

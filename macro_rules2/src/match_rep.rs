@@ -1,12 +1,4 @@
-
-
-
-
-
-
-
-use std::{fmt::Debug};
-
+use std::fmt::Debug;
 
 use crate::macro_match::MacroMatch;
 use crate::repetition::{MacroRepOp, MacroRepSep, OneOrMore};

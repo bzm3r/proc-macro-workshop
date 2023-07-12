@@ -9,24 +9,15 @@ mod rule;
 mod rules_def;
 mod transcriber;
 
-
-use proc_macro2::{
-    TokenStream as TokenStream2,
-};
+use proc_macro2::TokenStream as TokenStream2;
 
 use quote::{quote, ToTokens};
 use rules_def::MacroRulesDef;
 
-
-
-use std::{fmt::Debug};
+use std::fmt::Debug;
 use syn::{
-    parse::{
-        Parse, ParseStream,
-        Result as ParseResult,
-    },
-    parse_macro_input,
-    Ident,
+    parse::{Parse, ParseStream, Result as ParseResult},
+    parse_macro_input, Ident,
 };
 
 #[allow(dead_code)]
