@@ -1,27 +1,20 @@
-use paste::paste;
-use proc_macro2::{
-    extra::DelimSpan as DelimSpan2, Delimiter as Delimiter2, Spacing as Spacing2,
-    TokenStream as TokenStream2, TokenTree as TokenTree2,
-};
-use proc_macro2::{Group, Punct, Span};
-use quote::{quote, ToTokens};
-use std::fmt::{Display, Error as FmtError, Formatter, Result as FmtResult};
+
+
+
+
+
 use std::iter::once;
 use std::ops::{Deref, DerefMut};
-use std::{fmt::Debug, marker::PhantomData, ops::Range};
+use std::{fmt::Debug, ops::Range};
 use syn::{
-    buffer::Cursor,
     parse::{
-        discouraged::AnyDelimiter, Error as ParseError, Parse, ParseBuffer, ParseStream,
+        Error as ParseError, Parse, ParseStream,
         Result as ParseResult,
-    },
-    parse_macro_input,
-    token::{Brace as SynBrace, Bracket as SynBracket, Paren as SynParen, SelfType, Token},
-    Ident, ItemMacro, MacroDelimiter, Token,
+    }, Token,
 };
 
 #[derive(Debug)]
-enum OneOrMore<T: Parse> {
+pub(crate) enum OneOrMore<T: Parse> {
     One(T),
     More(Vec<T>),
 }
@@ -48,7 +41,7 @@ impl<T: Parse> Parse for OneOrMore<T> {
 }
 
 #[derive(Debug)]
-struct ZeroOrMore<T: Parse>(Vec<T>);
+pub(crate) struct ZeroOrMore<T: Parse>(Vec<T>);
 
 impl<T: Parse> ZeroOrMore<T> {
     pub fn new() -> Self {
@@ -98,10 +91,10 @@ impl<T: Parse> Parse for ZeroOrMore<T> {
 }
 
 #[derive(Debug)]
-struct MacroRepSep(&'static str);
+pub(crate) struct MacroRepSep(&'static str);
 
 #[derive(Debug)]
-enum MacroRepOp {
+pub(crate) enum MacroRepOp {
     OneOrMore,
     ZeroOrMore,
     Exactly(usize),

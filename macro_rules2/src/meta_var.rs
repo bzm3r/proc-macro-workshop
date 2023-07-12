@@ -1,23 +1,16 @@
 use paste::paste;
-use proc_macro2::{
-    extra::DelimSpan as DelimSpan2, Delimiter as Delimiter2, Spacing as Spacing2,
-    TokenStream as TokenStream2, TokenTree as TokenTree2,
-};
-use proc_macro2::{Group, Punct, Span};
-use quote::{quote, ToTokens};
-use std::fmt::{Display, Error as FmtError, Formatter, Result as FmtResult};
-use std::iter::once;
-use std::ops::{Deref, DerefMut};
-use std::{fmt::Debug, marker::PhantomData, ops::Range};
+
+
+
+
+
+
+use std::{fmt::Debug};
 use syn::{
-    buffer::Cursor,
     parse::{
-        discouraged::AnyDelimiter, Error as ParseError, Parse, ParseBuffer, ParseStream,
-        Result as ParseResult,
+        Error as ParseError,
     },
-    parse_macro_input,
-    token::{Brace as SynBrace, Bracket as SynBracket, Paren as SynParen, SelfType, Token},
-    Ident, ItemMacro, MacroDelimiter, Token,
+    Ident, Token,
 };
 
 macro_rules! preferred_stringify {
@@ -30,7 +23,7 @@ macro_rules! keyword_enum {
     ( $visibility:vis $enum_id:ident ; $($keyword:ident$(($out_string:ident))?)|+ ) => {
         paste! {
             #[derive(Debug)]
-            $visibility enum $enum_id {
+            $visibility pub(crate) enum $enum_id {
                 $([< $keyword:camel >]),+
             }
 
@@ -57,13 +50,13 @@ keyword_enum! {
 }
 
 #[derive(Debug)]
-enum MacroIdent {
+pub(crate) enum MacroIdent {
     Ident(Ident),
     Underscore(Token![_]),
 }
 
 #[derive(Debug)]
-struct MacroMetaVar {
+pub(crate) struct MacroMetaVar {
     id: MacroIdent,
     ty: MacroMetaVarType,
 }

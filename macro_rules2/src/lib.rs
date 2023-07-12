@@ -9,42 +9,41 @@ mod rule;
 mod rules_def;
 mod transcriber;
 
-use paste::paste;
+
 use proc_macro2::{
-    extra::DelimSpan as DelimSpan2, Delimiter as Delimiter2, Spacing as Spacing2,
-    TokenStream as TokenStream2, TokenTree as TokenTree2,
+    TokenStream as TokenStream2,
 };
-use proc_macro2::{Group, Punct, Span};
+
 use quote::{quote, ToTokens};
-use std::fmt::{Display, Error as FmtError, Formatter, Result as FmtResult};
-use std::iter::once;
-use std::ops::{Deref, DerefMut};
-use std::{fmt::Debug, marker::PhantomData, ops::Range};
+use rules_def::MacroRulesDef;
+
+
+
+use std::{fmt::Debug};
 use syn::{
-    buffer::Cursor,
     parse::{
-        discouraged::AnyDelimiter, Error as ParseError, Parse, ParseBuffer, ParseStream,
+        Parse, ParseStream,
         Result as ParseResult,
     },
     parse_macro_input,
-    token::{Brace as SynBrace, Bracket as SynBracket, Paren as SynParen, SelfType, Token},
-    Ident, ItemMacro, MacroDelimiter, Token,
+    Ident,
 };
 
 #[allow(dead_code)]
 #[derive(Debug)]
-struct MacroRules2 {
+pub(crate) struct MacroRules2 {
     name: Ident,
     body: MacroRulesDef,
 }
 
 impl Parse for MacroRules2 {
-    fn parse(input: ParseStream) -> ParseResult<Self> {
-        let name: Ident = input.parse()?;
-        let x: MacroDelimiter = input.parse()?;
-        let body = contents.parse()?;
+    fn parse(_input: ParseStream) -> ParseResult<Self> {
+        unimplemented!()
+        // let name: Ident = input.parse()?;
+        // let x: MacroDelimiter = input.parse()?;
+        // let body = contents.parse()?;
 
-        Ok(MacroRules2 { name, body })
+        // Ok(MacroRules2 { name, body })
     }
 }
 

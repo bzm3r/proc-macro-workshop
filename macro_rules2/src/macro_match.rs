@@ -1,37 +1,38 @@
-use paste::paste;
 use proc_macro2::{
-    extra::DelimSpan as DelimSpan2, Delimiter as Delimiter2, Spacing as Spacing2,
-    TokenStream as TokenStream2, TokenTree as TokenTree2,
-};
-use proc_macro2::{Group, Punct, Span};
-use quote::{quote, ToTokens};
-use std::fmt::{Display, Error as FmtError, Formatter, Result as FmtResult};
-use std::iter::once;
-use std::ops::{Deref, DerefMut};
-use std::{fmt::Debug, marker::PhantomData, ops::Range};
-use syn::{
-    buffer::Cursor,
-    parse::{
-        discouraged::AnyDelimiter, Error as ParseError, Parse, ParseBuffer, ParseStream,
-        Result as ParseResult,
-    },
-    parse_macro_input,
-    token::{Brace as SynBrace, Bracket as SynBracket, Paren as SynParen, SelfType, Token},
-    Ident, ItemMacro, MacroDelimiter, Token,
+    TokenStream as TokenStream2,
 };
 
+
+
+
+
+use std::{fmt::Debug};
+use syn::{
+    parse::{
+        Parse, ParseStream,
+        Result as ParseResult,
+    },
+    token::{Token}, Token,
+};
+
+use crate::match_rep::MacroMatchRep;
+use crate::matcher::MacroMatcher;
+use crate::meta_var::MacroMetaVar;
+
 #[derive(Debug)]
-enum MacroMatchEscape {
+pub(crate) enum MacroMatchEscape {
     Rep(MacroMatchRep),
     MetaVar(MacroMetaVar),
 }
 
 impl Parse for MacroMatchEscape {
-    fn parse(input: ParseStream) -> ParseResult<Self> {}
+    fn parse(_input: ParseStream) -> ParseResult<Self> {
+        unimplemented!()
+    }
 }
 
 #[derive(Debug)]
-enum MacroMatch {
+pub(crate) enum MacroMatch {
     Empty,
     Tokens(TokenStream2),
     Matcher(Box<MacroMatcher>),

@@ -1,33 +1,27 @@
-use paste::paste;
-use proc_macro2::{
-    extra::DelimSpan as DelimSpan2, Delimiter as Delimiter2, Spacing as Spacing2,
-    TokenStream as TokenStream2, TokenTree as TokenTree2,
-};
-use proc_macro2::{Group, Punct, Span};
-use quote::{quote, ToTokens};
-use std::fmt::{Display, Error as FmtError, Formatter, Result as FmtResult};
-use std::iter::once;
-use std::ops::{Deref, DerefMut};
-use std::{fmt::Debug, marker::PhantomData, ops::Range};
+
+
+use proc_macro2::{Punct, Span};
+
+use std::fmt::{Display, Formatter, Result as FmtResult};
+
+
+use std::{fmt::Debug};
 use syn::{
-    buffer::Cursor,
     parse::{
-        discouraged::AnyDelimiter, Error as ParseError, Parse, ParseBuffer, ParseStream,
+        Parse, ParseStream,
         Result as ParseResult,
     },
-    parse_macro_input,
-    token::{Brace as SynBrace, Bracket as SynBracket, Paren as SynParen, SelfType, Token},
-    Ident, ItemMacro, MacroDelimiter, Token,
+    token::{Brace as SynBrace, Bracket as SynBracket, Paren as SynParen},
 };
 
-trait LegalDelimPairSeal {
+pub(crate) trait LegalDelimPairSeal {
     fn left(&self) -> LegalDelimiter;
     fn right(&self) -> LegalDelimiter;
     fn left_span(&self) -> Span;
     fn right_span(&self) -> Span;
 }
 
-enum LegalDelimPair {
+pub(crate) enum LegalDelimPair {
     Brace(SynBrace),
     Bracket(SynBracket),
     Paren(SynParen),
@@ -38,17 +32,17 @@ enum LegalDelimPair {
 }
 
 #[derive(Debug, Clone)]
-struct PunctString(Vec<LegalPunct>);
+pub(crate) struct PunctString(Vec<LegalPunct>);
 
 impl Parse for PunctString {
-    fn parse(input: ParseStream) -> ParseResult<Self> {
+    fn parse(_input: ParseStream) -> ParseResult<Self> {
         unimplemented!()
     }
 }
 
-trait LegalDelimiterSeal {}
+pub(crate) trait LegalDelimiterSeal {}
 
-enum LegalDelimiter {
+pub(crate) enum LegalDelimiter {
     Punct {
         start: LegalPunct,
         end: LegalPunct,
@@ -67,7 +61,7 @@ impl LegalDelimiterSeal for LegalDelimiter {}
 macro_rules! legal_punct {
     ( $($id:ident : $p:literal),* ) => {
         #[derive(Debug, Clone)]
-        enum LegalPunct {
+        pub(crate) enum LegalPunct {
             $($id {
                 punct: Punct,
                 span: Span,
@@ -101,8 +95,8 @@ macro_rules! legal_punct {
             }
         }
 
-        impl From<(Punct, Span)> for LegalDelimiter {
-            fn from(punct_and_span: (Punct, Span)) -> Self {
+        impl From<(Punct, Span)> for LegalPunct {
+            fn from(punct_and_span: (Punct, Span)) -> LegalPunct {
                 let (punct, span) = punct_and_span;
                 match punct.as_char().to_string().as_str() {
                     $($p => {
@@ -111,6 +105,9 @@ macro_rules! legal_punct {
                             span,
                         }
                     }),*
+                    _ => {
+                        unreachable!("Should be able to convert all `Punct` into `LegalPunct`. Tried to convert {}", punct.as_char());
+                    },
                 }
             }
         }
@@ -124,13 +121,14 @@ legal_punct!(
     Colon: ":", Hash: "#", Dollar: "$", Question: "?", Backslash: "\\"
 );
 
-trait LegalPunctSeal {}
+pub(crate) trait LegalPunctSeal {}
 
 impl LegalPunctSeal for LegalPunct {}
 
 impl Parse for LegalDelimiter {
-    fn parse(input: ParseStream) -> ParseResult<LegalDelimiter> {
-        input.step(|cursor| cursor.punct()?)
+    fn parse(_input: ParseStream) -> ParseResult<LegalDelimiter> {
+        // input.step(|cursor| cursor.punct()?)
+        unimplemented!()
     }
 }
 
